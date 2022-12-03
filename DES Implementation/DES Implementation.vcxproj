@@ -119,6 +119,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,11 +130,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="des.cpp" />
-    <ClCompile Include="desbase.cpp" />
+    <ClCompile Include="bitmanipulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="des.h" />
-    <ClInclude Include="desbase.h" />
+    <ClInclude Include="bitmanipulation.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
