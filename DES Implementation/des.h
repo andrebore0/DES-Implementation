@@ -9,10 +9,32 @@
 #include <ranges>
 #include "Timer.h"
 #include "bitmanipulation.h"
+#include "release_input_handling.h"
 
-#define placeholder 1
+#define PLACEHOLDER 1
 
-enum Des_info
+#ifndef _DEBUG
+
+constexpr int				EXPECTED_ARGUMENTS	{ 4 };
+std::array<std::string, 3>	g_arguments			{"","",""};
+int							g_argumentCount		{};
+
+#endif // _DEBUG
+
+enum Status
+{
+	error_generic = -1,
+	ok,
+
+#ifndef _DEBUG
+
+	error_arguments
+
+#endif
+
+};
+
+enum DesInfo
 {
 	rounds = 16,
 	input_size = 64 / BYTE, // 64 / sizeof(char)
@@ -41,21 +63,22 @@ const std::array INITIAL_PERM_MATRIX{ // 64
 };
 
 const std::array FINAL_PERM_MATRIX{ // 64
-	placeholder
+	PLACEHOLDER
 };
 
 /* Forward Declarations / Firme */
-ui64		des_decrypt(ui64 input, ui64 key);
-ui64		des_crypt(ui64 input, ui64 key);
-ui64		stringToULL(std::string& str);
-std::string	toLowerCase(std::string str);
-void		print_usageError(const char* argv_zero);
+Status		des_main			();
+ui64		des_decrypt			(ui64 input, ui64 key);
+ui64		des_crypt			(ui64 input, ui64 key);
+ui64		stringToULL			(std::string& str);
+std::string	toLowerCase			(std::string str);
+void		print_usageError	(const char* argv_zero);
 
 template <std::size_t size>
-void		permute(ui64& input, const std::array<int, size>& matrix);
+void		permute				(ui64& input, const std::array<int, size>& matrix);
 
-void		key_scheduler(ui64& key);
-void		do_round();
+void		key_scheduler		(ui64& key);
+void		do_round			();
 /* ---------------------------- */
 
 #endif // DES_H

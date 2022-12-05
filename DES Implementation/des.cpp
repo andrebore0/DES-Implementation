@@ -3,16 +3,25 @@
 int main(int argc, char** argv)
 {
 #ifndef _DEBUG
-	if (argc <= 3 || (toLowerCase(argv[1]) != "\\crypt" && toLowerCase(argv[1]) != "\\decrypt"))
-	{
-		print_usageError((argv[0]) ? argv[0] : "");
-		return -1;
-	}
 
-	std::string function{ argv[1] };	// questo serve a capire se criptare o decriptare
-	std::string input_str{ argv[2] };	// input come string
-	std::string key_str{ argv[3] };		// ...
+	setArguments(argc, argv);
+
+#endif
+
+	return des_main();
+}
+
+Status des_main()
+{
+	/* Input parsing */
+#ifndef _DEBUG
+
+	std::string function	{ g_arguments.at(0) };	// questo serve a capire se criptare o decriptare
+	std::string input_str	{ g_arguments.at(1) };	// input come string
+	std::string key_str		{ g_arguments.at(2) };	// ...
+
 #else
+
 	std::string input_str;
 	std::string key_str;
 
@@ -22,27 +31,49 @@ int main(int argc, char** argv)
 
 	std::cout	<< "Inserire chiave: ";
 	std::getline(std::cin >> std::ws, key_str);
+
 #endif // _DEBUG
 
-	ui64 input	{ stringToULL(input_str) };	// conversione in intero senza segno
-	ui64 key	{ stringToULL(key_str) };	// numero intero = operazioni logiche bitwise
+	ui64 input	{ stringToULL(input_str) };		// conversione in intero senza segno
+	ui64 key	{ stringToULL(key_str) };		// numero intero = operazioni logiche bitwise
+	/* ------------- */
 
-#ifdef _DEBUG
+	/* Output */
+#ifndef _DEBUG
+	
+	ui64 result{ (function == "-crypt") ? des_crypt(input, key) : des_decrypt(input, key) };
+
+	if (result == error_generic)
+	{
+		std::cout << "Not implemented yet." << std::endl;
+	}
+	else
+	{
+		std::cout << "DES " << function.substr(1, function.length() - 1) << " di \'" << input_str << "\' usando la chiave \'" << key << "\': " << result << std::endl;
+	}
+
+#else
+
 	std::cout	<< "\nInput:\t\"" << input_str << "\" -> " << input
 				<< "\nChiave:\t\"" << key_str << "\" -> " << key
 				<< std::endl;
 
+	ui64 digest		{ des_crypt(input, key) };
+	ui64 decrypt	{ des_decrypt(digest, key) };
+
+	std::cout	<< "\nDigest:\t" << digest
+				<< "\nDigest decriptato:\t" << decrypt;
+
 #endif // _DEBUG
+	/* ------ */
 
-	//ull result{ des_crypt(input, key) };
-
-	return 0;
+	return ok;
 }
 
 ui64 des_decrypt(ui64 input, ui64 key)
 {
 	// TODO
-	return -1;
+	return static_cast<ui64>(error_generic);
 }
 
 ui64 des_crypt(ui64 input, ui64 key)
@@ -55,7 +86,7 @@ ui64 des_crypt(ui64 input, ui64 key)
 		do_round();
 	}
 
-	return -1;
+	return static_cast<ui64>(error_generic);
 }
 
 ui64 stringToULL(std::string& str)
@@ -91,28 +122,6 @@ std::string toLowerCase(std::string str) // idk
 	}
 
 	return str;
-}
-
-void print_usageError(const char* argv_zero)
-{
-	if (argv_zero)
-	{
-		std::string arg0 = argv_zero;
-
-		std::ranges::reverse(arg0); // reverse della directory
-
-		auto pos = std::distance(arg0.begin(), std::ranges::find(arg0, '\\')); // trova il primo '\'
-
-		arg0 = arg0.substr(0, pos); // substringa che va dal nome del programma al primo '\' trovato
-
-		std::ranges::reverse(arg0); // ora il nome al contrario torna "dritto"
-
-		std::cout << "Utilizzo: " << arg0 << " <input> <chiave> -crypt|-decrypt";
-	}
-	else
-	{
-		std::cout << "Utilizzo: <nome_programma> <input> <chiave> -crypt|-decrypt";
-	}
 }
 
 template <std::size_t size>
