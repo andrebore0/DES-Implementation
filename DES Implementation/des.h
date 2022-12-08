@@ -3,42 +3,28 @@
 
 #include <iostream>
 #include <string>
-#include <string_view>
 #include <array>
-#include <algorithm>
-#include <ranges>
-#include "Timer.h"
-#include "bitmanipulation.h"
-#include "release_input_handling.h"
+#include "bit_manipulation.h"
+#include "input_handling.h"
 
 #define PLACEHOLDER 1
 
-#ifndef _DEBUG
-
-constexpr int				EXPECTED_ARGUMENTS	{ 4 };
-std::array<std::string, 3>	g_arguments			{"","",""};
-int							g_argumentCount		{};
-
-#endif // _DEBUG
+constexpr int BYTE = 8;
 
 enum Status
 {
 	error_generic = -1,
 	ok,
-
 #ifndef _DEBUG
-
 	error_arguments
-
 #endif
-
 };
 
 enum DesInfo
 {
+	block_size = 64,
+	input_size = block_size / (sizeof(char) * BYTE), // valido sia per input che per chiave
 	rounds = 16,
-	input_size = 64 / BYTE, // 64 / sizeof(char)
-	key_size = 64 / BYTE // 64 / sizeof(char)
 };
 
 constexpr std::array KEYCOMPRESS_MATRIX{ // 56
@@ -51,7 +37,7 @@ constexpr std::array KEYCOMPRESS_MATRIX{ // 56
 	55, 57, 58, 59, 60, 61, 62, 63,
 };
 
-const std::array INITIAL_PERM_MATRIX{ // 64
+constexpr std::array INITIAL_PERM_MATRIX{ // 64
 	58, 50, 42, 34, 26, 18, 10, 2,
 	60, 52, 44, 36, 28, 20, 12, 4,
 	62, 54, 46, 38, 30, 22, 14, 6,
@@ -62,7 +48,7 @@ const std::array INITIAL_PERM_MATRIX{ // 64
 	63, 55, 47, 39, 31, 23, 15, 7
 };
 
-const std::array FINAL_PERM_MATRIX{ // 64
+constexpr std::array FINAL_PERM_MATRIX{ // 64
 	PLACEHOLDER
 };
 
@@ -71,8 +57,6 @@ Status		des_main			();
 ui64		des_decrypt			(ui64 input, ui64 key);
 ui64		des_crypt			(ui64 input, ui64 key);
 ui64		stringToULL			(std::string& str);
-std::string	toLowerCase			(std::string str);
-void		print_usageError	(const char* argv_zero);
 
 template <std::size_t size>
 void		permute				(ui64& input, const std::array<int, size>& matrix);
@@ -80,5 +64,4 @@ void		permute				(ui64& input, const std::array<int, size>& matrix);
 void		key_scheduler		(ui64& key);
 void		do_round			();
 /* ---------------------------- */
-
 #endif // DES_H

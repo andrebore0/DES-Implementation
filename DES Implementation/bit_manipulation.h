@@ -1,11 +1,9 @@
-#ifndef BITMANIPULATION_H
-#define BITMANIPULATION_H
+#ifndef BIT_MANIPULATION_H
+#define BIT_MANIPULATION_H
 
 #include <iostream>
 #include <cassert>
 #include <stdint.h>
-
-constexpr int BYTE = 8;
 
 typedef std::uint8_t	ui8;	// intero a 8-bit senza segno
 typedef std::uint16_t	ui16;	// intero a 16-bit senza segno
@@ -18,4 +16,4 @@ namespace bitmanipulation
 	void	setBit(auto& dst, int pos, bool bitState);
 }
 
-#endif // BITMANIPULATION_H
+#endif // BIT_MANIPULATION_H

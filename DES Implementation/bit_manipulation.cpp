@@ -1,4 +1,4 @@
-#include "bitmanipulation.h"
+#include "bit_manipulation.h"
 
 namespace bitmanipulation
 {

@@ -3,9 +3,10 @@
 int main(int argc, char** argv)
 {
 #ifndef _DEBUG
-
-	setArguments(argc, argv);
-
+	if (!setArguments(argc, argv))
+	{
+		return error_arguments;
+	}
 #endif
 
 	return des_main();
@@ -15,10 +16,10 @@ Status des_main()
 {
 	/* Input parsing */
 #ifndef _DEBUG
-
-	std::string function	{ g_arguments.at(0) };	// questo serve a capire se criptare o decriptare
-	std::string input_str	{ g_arguments.at(1) };	// input come string
-	std::string key_str		{ g_arguments.at(2) };	// ...
+	
+	std::string function	{ g_arguments.program_function };	// questo serve a capire se criptare o decriptare
+	std::string input_str	{ g_arguments.input_string };		// input come string
+	std::string key_str		{ g_arguments.key_string };			// ...
 
 #else
 
@@ -43,7 +44,7 @@ Status des_main()
 	
 	ui64 result{ (function == "-crypt") ? des_crypt(input, key) : des_decrypt(input, key) };
 
-	if (result == error_generic)
+	if (result == 0)
 	{
 		std::cout << "Not implemented yet." << std::endl;
 	}
@@ -54,15 +55,15 @@ Status des_main()
 
 #else
 
-	std::cout	<< "\nInput:\t\"" << input_str << "\" -> " << input
-				<< "\nChiave:\t\"" << key_str << "\" -> " << key
+	std::cout	<< "\nInput:\t\"" << input_str << "\" -> 0x" << std::hex << input
+				<< "\nChiave:\t\"" << key_str << "\" -> 0x" << std::hex << key
 				<< std::endl;
 
 	ui64 digest		{ des_crypt(input, key) };
 	ui64 decrypt	{ des_decrypt(digest, key) };
 
-	std::cout	<< "\nDigest:\t" << digest
-				<< "\nDigest decriptato:\t" << decrypt;
+	std::cout	<< "\nInput criptato -> 0x" << std::hex << digest
+				<< "\nInput decriptato -> 0x" << std::hex << decrypt;
 
 #endif // _DEBUG
 	/* ------ */
@@ -73,7 +74,7 @@ Status des_main()
 ui64 des_decrypt(ui64 input, ui64 key)
 {
 	// TODO
-	return static_cast<ui64>(error_generic);
+	return 0;
 }
 
 ui64 des_crypt(ui64 input, ui64 key)
@@ -86,7 +87,7 @@ ui64 des_crypt(ui64 input, ui64 key)
 		do_round();
 	}
 
-	return static_cast<ui64>(error_generic);
+	return 0;
 }
 
 ui64 stringToULL(std::string& str)
@@ -110,18 +111,6 @@ ui64 stringToULL(std::string& str)
 	}
 
 	return temp;
-}
-
-std::string toLowerCase(std::string str) // idk
-{
-	constexpr auto CASEMASK{ 0b00100000 };
-
-	for (char& elem : str)
-	{
-		elem = ((elem >= 'A' && elem <= 'Z') || (elem >= 'a' && elem <= 'z')) ? (elem | CASEMASK) : elem;
-	}
-
-	return str;
 }
 
 template <std::size_t size>

@@ -18,10 +18,13 @@
     <ClCompile Include="des.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bitmanipulation.cpp">
+    <ClCompile Include="bit_manipulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="release_input_handling.cpp">
+    <ClCompile Include="input_handling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="arguments.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,10 +35,13 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bitmanipulation.h">
+    <ClInclude Include="bit_manipulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="release_input_handling.h">
+    <ClInclude Include="input_handling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="arguments.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -129,14 +129,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="arguments.cpp" />
     <ClCompile Include="des.cpp" />
-    <ClCompile Include="bitmanipulation.cpp" />
-    <ClCompile Include="release_input_handling.cpp" />
+    <ClCompile Include="bit_manipulation.cpp" />
+    <ClCompile Include="input_handling.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="arguments.h" />
     <ClInclude Include="des.h" />
-    <ClInclude Include="bitmanipulation.h" />
-    <ClInclude Include="release_input_handling.h" />
+    <ClInclude Include="bit_manipulation.h" />
+    <ClInclude Include="input_handling.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
