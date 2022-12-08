@@ -19,7 +19,7 @@ Status des_main()
 	
 	std::string function	{ g_arguments.program_function };	// questo serve a capire se criptare o decriptare
 	std::string input_str	{ g_arguments.input_string };		// input come string
-	std::string key_str		{ g_arguments.key_string };			// ...
+	std::string key_str	{ g_arguments.key_string };			// ...
 
 #else
 
@@ -27,7 +27,7 @@ Status des_main()
 	std::string key_str;
 
 	std::cout	<< "Debug: argomenti ignorati.\n"
-				<< "Inserire input: ";
+			<< "Inserire input: ";
 	std::getline(std::cin >> std::ws, input_str);
 
 	std::cout	<< "Inserire chiave: ";
@@ -35,8 +35,8 @@ Status des_main()
 
 #endif // _DEBUG
 
-	ui64 input	{ stringToULL(input_str) };		// conversione in intero senza segno
-	ui64 key	{ stringToULL(key_str) };		// numero intero = operazioni logiche bitwise
+	ui64 input	{ stringToULL(input_str) };	// conversione in intero senza segno
+	ui64 key	{ stringToULL(key_str) };	// numero intero = operazioni logiche bitwise
 	/* ------------- */
 
 	/* Output */
@@ -56,14 +56,14 @@ Status des_main()
 #else
 
 	std::cout	<< "\nInput:\t\"" << input_str << "\" -> 0x" << std::hex << input
-				<< "\nChiave:\t\"" << key_str << "\" -> 0x" << std::hex << key
-				<< std::endl;
+			<< "\nChiave:\t\"" << key_str << "\" -> 0x" << std::hex << key
+			<< std::endl;
 
-	ui64 digest		{ des_crypt(input, key) };
+	ui64 digest	{ des_crypt(input, key) };
 	ui64 decrypt	{ des_decrypt(digest, key) };
 
 	std::cout	<< "\nInput criptato -> 0x" << std::hex << digest
-				<< "\nInput decriptato -> 0x" << std::hex << decrypt;
+			<< "\nInput decriptato -> 0x" << std::hex << decrypt;
 
 #endif // _DEBUG
 	/* ------ */
@@ -130,5 +130,5 @@ void key_scheduler(ui64& key)
 
 void do_round()
 {
-
+	// TODO
 }
