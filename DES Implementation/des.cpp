@@ -19,7 +19,7 @@ Status des_main()
 	
 	std::string function	{ g_arguments.program_function };	// questo serve a capire se criptare o decriptare
 	std::string input_str	{ g_arguments.input_string };		// input come string
-	std::string key_str	{ g_arguments.key_string };			// ...
+	std::string key_str	{ g_arguments.key_string };		// ...
 
 #else
 
