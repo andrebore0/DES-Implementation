@@ -12,7 +12,7 @@ struct arguments_container_t
 };
 
 extern arguments_container_t	g_arguments;
-extern int						g_argumentCount;
+extern int			g_argumentCount;
 
 #endif // _ARGUMENTS_H_
 #endif // _DEBUG
