@@ -10,11 +10,11 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	ui64 input{ 0b00010011'00110100'01010111'01111001'10011011'10111100'11011111'11110001 };
+	ui64 key{ 0b00010011'00110100'01010111'01111001'10011011'10111100'11011111'11110001 };
 
 	std::array<ui64, 16> x{};
 
-	key_schedule(input, x);
+	key_schedule(key, x);
 
 	//return des_main();
 	return 0;
