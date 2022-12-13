@@ -1,4 +1,5 @@
 #include "des.h"
+#include "intrin.h"
 
 int main(int argc, char** argv)
 {
@@ -9,7 +10,14 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	return des_main();
+	ui64 input{ 0b00010011'00110100'01010111'01111001'10011011'10111100'11011111'11110001 };
+
+	std::array<ui64, 16> x{};
+
+	key_schedule(input, x);
+
+	//return des_main();
+	return 0;
 }
 
 Status des_main()
@@ -79,10 +87,10 @@ ui64 des_decrypt(ui64 input, ui64 key)
 
 ui64 des_crypt(ui64 input, ui64 key)
 {
-	permute(input, INITIAL_PERM_MATRIX);	// -> void	initial_permutation	(ull& input)
-	key_scheduler(key);			// -> void	key_compress		(ull& key)
+	permute(input, des_data::INITIAL_PERM_MATRIX);
+	//key_scheduler(key , 0);
 
-	for (int i = 0; i < rounds; ++i) // left part
+	for (int i{}; i < rounds; ++i) // left part
 	{
 		do_round();
 	}
@@ -104,27 +112,67 @@ ui64 stringToULL(std::string& str)
 
 	ui64 temp{};
 
-	for (int i = 0; i < input_size; ++i) // (string)input -> (unsigned long long)input
+	for (int i{}; i < input_size; ++i) // (string)input -> (unsigned long long)input
 	{
-		temp <<= BYTE;	// 0x00001234 -> 0x12340000
+		temp <<= byte;	// 0x00001234 -> 0x12340000
 		temp ^= str[i];	// input char estratto nel byte liberato
 	}
 
 	return temp;
 }
 
-template <std::size_t size>
-void permute(ui64& input, const std::array<int, size>& matrix)
+/*\
+ *	permuta i bit di 'input' ed esegue eventuale compressione
+ *	segue le posizioni date da 'permuteTable'
+ *	{ 0 < matrix.size() < sizeof(T) * byte }
+\*/
+template <bit_manipulation::UnsignedInteger T, std::size_t size>
+void permute(T& input, const std::array<int, size>& permuteTable)
 {
-	
-	ui64 inputCopy{ input };
+	assert( // bounds checking
+		(permuteTable.size() > 0 && permuteTable.size() <= (sizeof(T) * byte))
+		&&
+		"\'sizeof(matrix)\' out of bounds in \'permute(T&, const std::array<int, size>&)\'."
+	);
+
+	T permutedInput	{}; // mi serve 'input' intatto per lettura
+	int maxIndex	{ (sizeof(T) * byte) - 1 };
+
+	for (int i{}; i < permuteTable.size(); ++i)
+	{
+		bit_manipulation::setBit(
+			permutedInput,
+			maxIndex - i,
+			bit_manipulation::getBit(input, maxIndex - (permuteTable.at(i) - 1))
+		);
+	}
+
+	// la differenza tra le dimensioni mi dirà di quanti bit "comprimere"
+	input = permutedInput >> ((sizeof(T) * byte) - permuteTable.size());
 }
 
-void key_scheduler(ui64& key)
+
+/*\
+ *	Genera le 16 chiavi a 48-bit utilizzate nei rispettivi round partendo da una singola chiave a 64-bit
+\*/
+void key_schedule(ui64 key, std::array<ui64, 16>& dst) 
 {
-	// dividi input
-	ui32 keyLeft{ static_cast<ui32>(key >> (sizeof(ui64) >> 1)) }; // quick hack: ((int)a >> 1) == ((int)a / 2)
-	//ui32 keyRight{ key >> static_cast<ui32>(sizeof(ui64) >> 1) };
+	permute(key, des_data::KEY_SCHEDULER_PC_1); // 64-bit -> 56-bit permutata
+
+	printBits(key, "permuted PC-1", 8);
+
+	ui32 leftPart	{ static_cast<ui32>(key >> key_size_PC1 / 2) };
+	ui32 rightPart	{ static_cast<ui32>(key & right_key_mask_PC1) };
+
+	std::cout << std::endl;
+
+	printBits(leftPart, "C0", 4, 7);
+	printBits(rightPart, "D0", 4, 7);
+
+	for (int i{}; i < rounds; ++i)
+	{
+		dst.at(i) = 1;
+	}
 
 }
 
@@ -132,3 +180,27 @@ void do_round()
 {
 
 }
+
+/*\
+ *	Stampa i bit di un numero.
+ *	È possibile definire la formattazione del numero e una stringa grazie ai 3 paramtetri finali.
+\*/
+#ifdef _DEBUG
+template <bit_manipulation::UnsignedInteger T>
+void printBits(T input, std::string str, int startPos, int separatorPos)
+{
+	int Tsize = (sizeof(T) * byte);
+
+	std::cout << str << ": ";
+	for (int i{ (Tsize - 1) - startPos }; i >= 0; --i)
+	{
+		if ((i + 1) % separatorPos == 0 && i != (Tsize - 1) - startPos)
+		{
+			std::cout << '\'';
+		}
+
+		std::cout << bit_manipulation::getBit(input, i);
+	}
+	std::cout << std::endl;
+}
+#endif // _DEBUG

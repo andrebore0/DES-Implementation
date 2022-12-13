@@ -1,13 +1,14 @@
+#ifndef _DEBUG
 #include "input_handling.h"
 
-bool setArguments(int argc, char** argv)
+bool setArguments(int argc, char** argv) // imposto gli argomenti globali da qui
 {
-	if (argc < EXPECTED_ARGUMENTS)
+	if (argc < EXPECTED_ARGUMENTS) // controllo gli argomenti qui...
 	{
 		print_usageError(argv[0]);
 		return false;
 	}
-	else if (
+	else if ( // ...e qui
 		g_arguments.program_function = toLowerCase(argv[1]); // standard C++17
 		g_arguments.program_function != "-crypt" && g_arguments.program_function != "-decrypt"
 	)
@@ -24,7 +25,7 @@ bool setArguments(int argc, char** argv)
 	return true;
 }
 
-void print_usageError(const char* argv_zero)
+void print_usageError(const char* argv_zero) // stampa il messaggio di errore
 {
 	if (argv_zero)
 	{
@@ -34,9 +35,9 @@ void print_usageError(const char* argv_zero)
 
 		auto pos = std::distance(arg0.begin(), std::ranges::find(arg0, '\\')); // trova il primo '\'
 
-		arg0 = arg0.substr(0, pos); // substringa che va dal nome del programma al primo '\' trovato
+		arg0 = arg0.substr(0, pos); // estrae nome del programma
 
-		std::ranges::reverse(arg0); // ora il nome al contrario torna "dritto"
+		std::ranges::reverse(arg0); // rimette la stringa "dritta"
 
 		std::cout << "Utilizzo: " << arg0 << " <input> <chiave> -crypt|-decrypt";
 	}
@@ -57,4 +58,4 @@ std::string toLowerCase(std::string str)
 
 	return str;
 }
-
+#endif // _DEBUG

@@ -18,9 +18,6 @@
     <ClCompile Include="des.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bit_manipulation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="input_handling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

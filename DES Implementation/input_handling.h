@@ -1,3 +1,4 @@
+#ifndef _DEBUG
 #ifndef _INPUT_HANDLING_
 #define _INPUT_HANDLING_
 
@@ -14,3 +15,4 @@ void		print_usageError	(const char* argv_zero);
 std::string	toLowerCase			(std::string str);
 
 #endif // _INPUT_HANDLING_
+#endif // _DEBUG
