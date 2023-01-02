@@ -1,206 +1,260 @@
 #include "des.h"
-#include "intrin.h"
 
 int main(int argc, char** argv)
 {
-#ifndef _DEBUG
-	if (!setArguments(argc, argv))
+	Arguments arguments;
+
+	try
 	{
+		_LOG("[main()] Impostazione input.\n\n")
+		setInput(argc, argv, arguments);
+	}
+	catch (ArgumentsException e)
+	{
+		std::cerr << "Catturata ArgumentsException: " << e.getError() << '\n' << std::endl;
+		print_usageError(argv[0]);
 		return error_arguments;
 	}
-#endif
 
-	ui64 key{ 0b00010011'00110100'01010111'01111001'10011011'10111100'11011111'11110001 };
+	_LOG("[main()] Input impostato correttamente.\n\n")
 
-	std::array<ui64, 16> x{};
+	Status return_code = des_main(arguments);
 
-	key_schedule(key, x);
+	return return_code;
 
-	//return des_main();
 	return 0;
 }
 
-Status des_main()
+Status des_main(const Arguments& arguments)
 {
 	/* Input parsing */
-#ifndef _DEBUG
-	
-	std::string function	{ g_arguments.program_function };	// questo serve a capire se criptare o decriptare
-	std::string input_str	{ g_arguments.input_string };		// input come string
-	std::string key_str		{ g_arguments.key_string };			// ...
+	ProgramFunction		function		{ arguments.program_function };	// questo serve a capire se criptare o decriptare
+	std::string			input_string	{ arguments.input_string };		// input come string
+	std::string			key_string		{ arguments.key_string };		// ...
 
-#else
+	ui64 input{};
+	ui64 key{};
 
-	std::string input_str;
-	std::string key_str;
+	switch (arguments.input_type)
+	{
+	case hexadecimal:
+		_LOG("[des_main()] Conversione da stringa(esadecimale) a \'ui64\'.\n\n")
+		input	= stringToUi64(input_string, std::hex);
+		key		= stringToUi64(key_string, std::hex);
+		break;
 
-	std::cout	<< "Debug: argomenti ignorati.\n"
-				<< "Inserire input: ";
-	std::getline(std::cin >> std::ws, input_str);
+	case decimal:
+		_LOG("[des_main()] Conversione da stringa(decimale) a \'ui64\'.\n\n")
+		input	= stringToUi64(input_string, std::dec);
+		key		= stringToUi64(key_string, std::dec);
+		break;
 
-	std::cout	<< "Inserire chiave: ";
-	std::getline(std::cin >> std::ws, key_str);
-
-#endif // _DEBUG
-
-	ui64 input	{ stringToULL(input_str) };		// conversione in intero senza segno
-	ui64 key	{ stringToULL(key_str) };		// numero intero = operazioni logiche bitwise
+	case string:
+		_LOG("[des_main()] Conversione da stringa(ascii) a \'ui64\'.\n\n")
+		input	= asciiToUi64(input_string);
+		key		= asciiToUi64(key_string);
+	}
 	/* ------------- */
 
 	/* Output */
-#ifndef _DEBUG
-	
-	ui64 result{ (function == "-crypt") ? des_crypt(input, key) : des_decrypt(input, key) };
+	std::cout << std::hex;
 
-	if (result == 0)
-	{
-		std::cout << "Not implemented yet." << std::endl;
-	}
-	else
-	{
-		std::cout << "DES " << function.substr(1, function.length() - 1) << " di \'" << input_str << "\' usando la chiave \'" << key << "\': " << result << std::endl;
-	}
+	std::cout	<< "Input:\t\"" << input_string << "\" -> 0x" << input
+				<< "\nChiave:\t\"" << key_string << "\" -> 0x" << key
+				<< "\n\n";
 
-#else
+	std::cout << std::dec;
 
-	std::cout	<< "\nInput:\t\"" << input_str << "\" -> 0x" << std::hex << input
-				<< "\nChiave:\t\"" << key_str << "\" -> 0x" << std::hex << key
-				<< std::endl;
-
-	ui64 digest		{ des_crypt(input, key) };
-	ui64 decrypt	{ des_decrypt(digest, key) };
-
-	std::cout	<< "\nInput criptato -> 0x" << std::hex << digest
-				<< "\nInput decriptato -> 0x" << std::hex << decrypt;
-
-#endif // _DEBUG
+	ui64 result{ des_operate(input, key, function) };
 	/* ------ */
+	std::cout << std::hex;
+
+	std::cout << ((function) ? "Decrypt: 0x" : "Crypt: 0x") << result << ((isUi64Printable(result)) ? (" -> \"" + uiToASCIIString(result) + "\"\n") : "\n");
+	std::cout << std::dec;
 
 	return ok;
 }
 
-ui64 des_decrypt(ui64 input, ui64 key)
+ui64 des_operate(ui64 input, ui64 key, ProgramFunction function)
 {
-	// TODO
-	return 0;
-}
+	std::array<ui64, rounds> keyTable{};
+	key_schedule(key, keyTable);
+	_LOG("[des_operate()] Chiavi ottenute.\n\n")
 
-ui64 des_crypt(ui64 input, ui64 key)
-{
-	permute(input, des_data::INITIAL_PERM_MATRIX);
-	//key_scheduler(key , 0);
+	permute(input, des_data::initial_perm_matrix);
+	_LOG(
+		"[des_operate()] Permutazione iniziale: \n" +
+		uiBitsToString(input, 8) + " -> 0x" + ui64ToString(input, std::hex) + "\n\n"
+	)
 
-	for (int i{}; i < rounds; ++i) // left part
+	ui32 inputLeftPart	{ static_cast<ui32>(input >> ui64_size / 2) };	// L0
+	ui32 inputRightPart	{ static_cast<ui32>(input & ui32_mask) };		// R0
+
+	if (function == decrypt)
 	{
-		do_round();
+		std::ranges::reverse(keyTable);
+		_LOG("[des_operate()] function == decrypt, inverto \'keyTable\'.\n\n")
 	}
 
-	return 0;
-}
-
-ui64 stringToULL(std::string& str)
-{
-	for (; str.length() > input_size;) // trimming
+	ui32 oldLeftPart{};
+	for (int i = 0; i < rounds; ++i)
 	{
-		str.pop_back();
+		_LOG(
+			"[des_operate()] Round " + std::to_string(i + 1) + ": \n" +
+			"\tL" + std::to_string(i) + ": " + uiBitsToString(inputLeftPart, 8) + " -> 0x" + ui64ToString(inputLeftPart, std::hex) + "\n" +
+			"\tR" + std::to_string(i) + ": " + uiBitsToString(inputRightPart, 8) + " -> 0x" + ui64ToString(inputRightPart, std::hex) + "\n" +
+			"\tChiave " + std::to_string(i) + ": " + uiBitsToString(keyTable.at(i), 7, 15) + " -> 0x" + ui64ToString(keyTable.at(i), std::hex) + "\n"
+		)
+		oldLeftPart = inputLeftPart;
+		inputLeftPart = inputRightPart;
+
+		inputRightPart = oldLeftPart ^ feistel(inputRightPart, keyTable.at(i));
+		
+		_LOG(
+			"\tR" + std::to_string(i + 1) + " = L" + std::to_string(i) +
+			" OR feistel(R" + std::to_string(i) + ", Chiave" + std::to_string(i) + "): " +
+			uiBitsToString(inputRightPart, 8) + " -> 0x" + ui64ToString(inputRightPart, std::hex) + "\n\n"
+		)
 	}
 
-	for (; str.length() < input_size;) // padding
-	{
-		str += '\0';
-	}
+	ui64 output{ (static_cast<ui64>(inputRightPart) << (block_size / 2)) | inputLeftPart }; // R16 concat L16
 
-	ui64 temp{};
+	_LOG(
+		"Output pre-permutazione: " + uiBitsToString(output, 8) + " -> 0x" + ui64ToString(output, std::hex) + "\n\n"
+	)
 
-	for (int i{}; i < input_size; ++i) // (string)input -> (unsigned long long)input
-	{
-		temp <<= byte;	// 0x00001234 -> 0x12340000
-		temp ^= str[i];	// input char estratto nel byte liberato
-	}
+	permute(output, des_data::final_perm_matrix);
 
-	return temp;
+	return output;
 }
 
 /*\
- *	permuta i bit di 'input' ed esegue eventuale compressione
+ *	permuta i bit di 'input' ed esegue eventuale compressione/espansione
  *	segue le posizioni date da 'permuteTable'
- *	{ 0 < matrix.size() < sizeof(T) * byte }
+ *	{ 0 < permuteTable.size() <= (sizeof(_Ui) * byte) }
 \*/
-template <bit_manipulation::UnsignedInteger T, std::size_t size>
-void permute(T& input, const std::array<int, size>& permuteTable)
+template <bit_manipulation::UnsignedInteger _Ui, std::size_t size>
+void permute(_Ui& input, const std::array<int, size>& permuteTable, int inputSize)
 {
 	assert( // bounds checking
-		(permuteTable.size() > 0 && permuteTable.size() <= (sizeof(T) * byte))
+		(permuteTable.size() > 0 && permuteTable.size() <= (sizeof(_Ui) * byte))
 		&&
-		"\'sizeof(matrix)\' out of bounds in \'permute(T&, const std::array<int, size>&)\'."
+		"\'permuteTable.size()\' out of range in \'permute(_Ui&, const std::array<int, size>&, int)\'."
 	);
 
-	T permutedInput	{}; // mi serve 'input' intatto per lettura
-	int maxIndex	{ (sizeof(T) * byte) - 1 };
+	_Ui permutedInput	{}; // mi serve 'input' intatto per lettura
+	int maxIndex		{ static_cast<int>(permuteTable.size() - 1) };
 
-	for (int i{}; i < permuteTable.size(); ++i)
+	for (int i{}; i <= maxIndex; ++i)
 	{
 		bit_manipulation::setBit(
 			permutedInput,
 			maxIndex - i,
-			bit_manipulation::getBit(input, maxIndex - (permuteTable.at(i) - 1))
+			bit_manipulation::getBit(input, inputSize - permuteTable.at(i))
 		);
 	}
 
-	// la differenza tra le dimensioni mi dirà di quanti bit "comprimere"
-	input = permutedInput >> ((sizeof(T) * byte) - permuteTable.size());
+	input = permutedInput;
 }
-
 
 /*\
  *	Genera le 16 chiavi a 48-bit utilizzate nei rispettivi round partendo da una singola chiave a 64-bit
 \*/
-void key_schedule(ui64 key, std::array<ui64, 16>& dst) 
+void key_schedule(ui64 key, std::array<ui64, rounds>& dst)
 {
-	permute(key, des_data::KEY_SCHEDULER_PC_1); // 64-bit -> 56-bit permutata
+	permute(key, des_data::key_scheduler_pc_1); // 64-bit -> 56-bit
+	
+	_LOG(
+		"[key_schedule()] Chiave permutata(PC-1):\n" +
+		uiBitsToString(key, 8) + " -> 0x" + ui64ToString(key, std::hex) + "\n\n"
+	)
 
-	printBits(key, "permuted PC-1", 8);
-
-	ui32 leftPart	{ static_cast<ui32>(key >> key_size_PC1 / 2) };
+	ui32 leftPart	{ static_cast<ui32>(key >> key_size_PC1 / 2) };	// 28-bit
 	ui32 rightPart	{ static_cast<ui32>(key & right_key_mask_PC1) };
-
-	std::cout << std::endl;
-
-	printBits(leftPart, "C0", 4, 7);
-	printBits(rightPart, "D0", 4, 7);
-
+	
+	ui64 temp{};
 	for (int i{}; i < rounds; ++i)
 	{
-		dst.at(i) = 1;
+		bit_manipulation::rotateBits(
+			leftPart,
+			des_data::key_shift_table.at(i),
+			(key_size_PC1 / 2) - 1
+		);
+		
+		bit_manipulation::rotateBits(
+			rightPart,
+			des_data::key_shift_table.at(i),
+			(key_size_PC1 / 2) - 1
+		);
+
+		temp = leftPart;
+		temp = (temp << key_size_PC1 / 2) ^ rightPart;
+
+		permute(temp, des_data::key_scheduler_pc_2, key_size_PC1); // praticamente rimasto a 64-bit, quindi devo specificare la dimensione
+
+		_LOG(
+			"Chiave " + std::to_string(i + 1) + ": " +
+			uiBitsToString(temp, 8) + " -> 0x" + ui64ToString(temp, std::hex) +
+			"\n"
+		)
+
+		dst.at(i) = temp;
 	}
 
+	_LOG("\n")
 }
 
-void do_round()
+ui32 feistel(ui32 block, ui64 key) // la chiave è a 48-bit, salvata come 64-bit
 {
+	ui64 blockCopy	{ block };
+	ui32 output		{};
 
-}
+	permute(blockCopy, des_data::feistel_expansion_table, block_size / 2); // 32 -> 48
 
-/*\
- *	Stampa i bit di un numero.
- *	È possibile definire la formattazione del numero e una stringa grazie ai 3 paramtetri finali.
-\*/
-#ifdef _DEBUG
-template <bit_manipulation::UnsignedInteger T>
-void printBits(T input, std::string str, int startPos, int separatorPos)
-{
-	int Tsize = (sizeof(T) * byte);
+	blockCopy ^= key;
 
-	std::cout << str << ": ";
-	for (int i{ (Tsize - 1) - startPos }; i >= 0; --i)
+	ui64 temp{};	// contiene il valore a 6-bit estratto
+	int row{};		// riga di s-box
+	int col{};		// colonna di s-box
+	for (int i{}; i < sbox_rounds; ++i)
 	{
-		if ((i + 1) % separatorPos == 0 && i != (Tsize - 1) - startPos)
-		{
-			std::cout << '\'';
-		}
+		output <<= byte / 2; // xxxx -> xxxx 0000
+		temp = blockCopy >> ((sbox_input_size * sbox_rounds) - ((i + 1) * sbox_input_size));	// 010011 011010 101000 101101 -> 010011 011010
+		temp = temp & sbox_input_mask;															// 010011 011010 -> 011010
 
-		std::cout << bit_manipulation::getBit(input, i);
+		row = (bit_manipulation::getBit(temp, sbox_input_size - 1) << 1) | static_cast<int>(bit_manipulation::getBit(temp, 0)); // 0xxxx0 -> 00 -> 0dec
+		
+		col = (bit_manipulation::getBit(temp, sbox_input_size - 2) << 3) | // x1101x -> 1101 -> 13dec
+			(bit_manipulation::getBit(temp, sbox_input_size - 3) << 2) |
+			(bit_manipulation::getBit(temp, sbox_input_size - 4) << 1) |
+			static_cast<int>(bit_manipulation::getBit(temp, sbox_input_size - 5));
+		
+		output |= des_data::sbox.at(i).at(row).at(col); // sbox[1][0][13] (fa 0) -> ... 0000
 	}
-	std::cout << std::endl;
+
+	permute(output, des_data::feistel_p_table, block_size / 2);
+
+	return output;
+}
+
+#ifdef _DEBUG
+template <bit_manipulation::UnsignedInteger _Ui>
+std::string uiBitsToString(_Ui x, int separatorMultiple, int startPos)
+{
+	std::string output{ std::bitset<sizeof(_Ui)* byte>(x).to_string() };
+
+	if (separatorMultiple %= static_cast<int>(sizeof(_Ui) * byte); separatorMultiple <= 0)
+	{
+		return output.substr(startPos);
+	}
+
+	for (int currentPos{ static_cast<int>(sizeof(_Ui) * byte) - separatorMultiple };
+		currentPos > startPos;
+		currentPos = (currentPos - separatorMultiple))
+	{
+		output.insert(currentPos, "\'");
+	}
+
+	return output.substr(startPos);
 }
 #endif // _DEBUG

@@ -21,7 +21,10 @@
     <ClCompile Include="input_handling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="arguments.cpp">
+    <ClCompile Include="string_manipulation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bit_manipulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,7 +41,10 @@
     <ClInclude Include="input_handling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="arguments.h">
+    <ClInclude Include="string_manipulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="des_defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
