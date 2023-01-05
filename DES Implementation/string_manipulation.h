@@ -9,22 +9,27 @@
 #include <cstring>
 #include "bit_manipulation.h"
 
-#ifndef _MSC_VER // _strcmpi non è standard, è implementata in MSVC++ ma non in g++
-#define _strcmpi compareStringCase
-#endif
-
 std::string	ui64ToString		(ui64 input, std::ios_base& (*ui64_format)(std::ios_base&) = std::dec);
-ui64		stringToUi64		(const std::string& str, std::ios_base& (*string_format)(std::ios_base&));
-bool		compareStringCase	(std::string_view str1, std::string_view str2);
-std::string	toLowerCase			(std::string str);
-ui64		asciiToUi64			(std::string& str);
+ui64		stringBaseToUi64		(const std::string& str, std::ios_base& (*string_format)(std::ios_base&) = std::dec);
+std::string	toLowerCase			(std::string_view str);
+bool		compareString		(std::string_view str, std::string_view possibleValue, bool checkCase = true);
 
-template <bit_manipulation::UnsignedInteger _Ui>
+template <std::size_t size>
+bool		compareString		(std::string_view str, std::array<std::string_view, size> possibleValues, bool checkCase = true)
+{
+	auto isEqual{ [str, checkCase](std::string_view value) { return compareString(str, value, checkCase); } };
+
+	return std::ranges::any_of(possibleValues, isEqual);
+}
+
+ui64		stringASCIIToUi64			(std::string& str);
+
+template <std::unsigned_integral _Ui>
 bool		isUi64Printable		(_Ui input)
 {
 	for (std::size_t i{}; i < sizeof(_Ui); ++i)
 	{
-		if (!std::isprint(static_cast<unsigned char>(input & ui8_mask)))
+		if (!std::isprint(static_cast<unsigned char>(input & ui8_mask)) && (input & ui8_mask) != 0)
 		{
 			return false;
 		}
@@ -35,14 +40,14 @@ bool		isUi64Printable		(_Ui input)
 	return true;
 }
 
-template <bit_manipulation::UnsignedInteger _Ui>
-std::string	uiToASCIIString		(_Ui x)
+template <std::unsigned_integral _Ui>
+std::string	uiToASCIIString		(_Ui input)
 {
 	std::string output{ "" };
 
 	for (int i{}; i < sizeof(_Ui); ++i)
 	{
-		char temp = bit_manipulation::getByte(x, i);
+		char temp = bit_manipulation::getByte(input, i);
 
 		output += temp;
 	}

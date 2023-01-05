@@ -12,8 +12,8 @@ void setInput(int argc, char** argv, Arguments& dst) // imposto gli argomenti da
 		throw ArgumentsException{ "Numero di argomenti insufficiente." };
 	}
 	
-	std::string program_function_str = argv[1];
-	std::string input_type_str = argv[2];
+	std::string program_function_str	= argv[1];
+	std::string input_type_str			= argv[2];
 
 	dst.input_type			= checkInputType(input_type_str.substr(1, input_type_str.length() - 1));
 	dst.program_function	= checkProgramFunction(program_function_str.substr(1, program_function_str.length() - 1));
@@ -35,11 +35,9 @@ void getInputManually(Arguments& dst)
 	std::string input_type_str;
 	std::getline(std::cin >> std::ws, input_type_str);
 
-	while (
-		_strcmpi(input_type_str.c_str(), "hex") && _strcmpi(input_type_str.c_str(), "hexadecimal") && _strcmpi(input_type_str.c_str(), "h") &&
-		_strcmpi(input_type_str.c_str(), "dec") && _strcmpi(input_type_str.c_str(), "decimal") && _strcmpi(input_type_str.c_str(), "d") &&
-		_strcmpi(input_type_str.c_str(), "str") && _strcmpi(input_type_str.c_str(), "string") && _strcmpi(input_type_str.c_str(), "s")
-	)
+	while (!compareString(input_type_str, accepted_input::HEX, false) &&
+		!compareString(input_type_str, accepted_input::DEC, false) &&
+		!compareString(input_type_str, accepted_input::STR, false))
 	{
 		std::cout << "Errore:\nTipi di input accettati: (hex|hexadecimal|h) | (dec|decimal|d) | (str|string|s)\n\n";
 
@@ -49,17 +47,15 @@ void getInputManually(Arguments& dst)
 	/* ------------- */
 
 	/* Tipo di funzione */
-	std::cout << "Tipi di funzione accettati: (crypt|c) | (decrypt|d)\n\n";
+	std::cout << "Tipi di funzione accettati: (encrypt|e) | (decrypt|d)\n\n";
 	std::cout << "Inserire tipo di funzione: ";
 	std::string program_function_str;
 	std::getline(std::cin >> std::ws, program_function_str);
 
-	while (
-		_strcmpi(program_function_str.c_str(), "crypt") && _strcmpi(program_function_str.c_str(), "c") &&
-		_strcmpi(program_function_str.c_str(), "decrypt") && _strcmpi(program_function_str.c_str(), "d")
-		)
+	while (!compareString(program_function_str, accepted_input::ENCRYPT, false) &&
+		!compareString(program_function_str, accepted_input::DECRYPT, false))
 	{
-		std::cout << "Errore:\nTipi di funzione accettati: (crypt|c) | (decrypt|d)\n\n";
+		std::cout << "Errore:\nTipi di funzione accettati: (encrypt|e) | (decrypt|d)\n\n";
 
 		std::cout << "Inserire tipo di funzione: ";
 		std::getline(std::cin >> std::ws, program_function_str);
@@ -82,21 +78,15 @@ void getInputManually(Arguments& dst)
 
 InputType checkInputType(std::string_view str)
 {
-	if (!_strcmpi(str.data(), "hex") ||
-		!_strcmpi(str.data(), "hexadecimal") ||
-		!_strcmpi(str.data(), "h"))
+	if (compareString(str, accepted_input::HEX, false))
 	{
 		return hexadecimal;
 	}
-	if (!_strcmpi(str.data(), "dec") ||
-		!_strcmpi(str.data(), "decimal") ||
-		!_strcmpi(str.data(), "d"))
+	if (compareString(str, accepted_input::DEC, false))
 	{
 		return decimal;
 	}
-	if (!_strcmpi(str.data(), "str") ||
-		!_strcmpi(str.data(), "string") ||
-		!_strcmpi(str.data(), "s"))
+	if (compareString(str, accepted_input::STR, false))
 	{
 		return string;
 	}
@@ -106,13 +96,11 @@ InputType checkInputType(std::string_view str)
 
 ProgramFunction checkProgramFunction(std::string_view str)
 {
-	if (!_strcmpi(str.data(), "crypt") ||
-		!_strcmpi(str.data(), "c"))
+	if (compareString(str, accepted_input::ENCRYPT, false))
 	{
-		return crypt;
+		return encrypt;
 	}
-	if (!_strcmpi(str.data(), "decrypt") ||
-		!_strcmpi(str.data(), "d"))
+	if (compareString(str, accepted_input::DECRYPT, false))
 	{
 		return decrypt;
 	}
@@ -120,7 +108,7 @@ ProgramFunction checkProgramFunction(std::string_view str)
 	return program_function_undefined; // possibile solo se chiamata da 'setInput()'
 }
 
-void print_usageError(const char* argv_zero) // stampa il messaggio di errore
+void printUsageError(const char* argv_zero) // stampa il messaggio di errore
 {
 	if (argv_zero)
 	{
@@ -134,10 +122,15 @@ void print_usageError(const char* argv_zero) // stampa il messaggio di errore
 
 		std::ranges::reverse(arg0); // 'exe.cba' -> 'abc.exe'
 
-		std::cout << "Utilizzo: " << arg0 << " (-crypt|-decrypt) (-hex|-dec|-str) <input> <chiave>";
+		std::cout << "Utilizzo: " << arg0 << " (-encrypt|-decrypt) (-hex|-dec|-str) <input> <chiave>";
 	}
 	else
 	{
-		std::cout << "Utilizzo: <nome_programma> (-crypt|-decrypt) (-hex|-dec|-str) <input> <chiave>";
+		std::cout << "Utilizzo: <nome_programma> (-encrypt|-decrypt) (-hex|-dec|-str) <input> <chiave>";
 	}
+}
+
+std::vector<ui64> inputToBlocks(std::string input, InputType type)
+{
+	return std::vector<ui64>();
 }

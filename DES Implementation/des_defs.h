@@ -5,18 +5,10 @@
 #include <map>
 #include "bit_manipulation.h"
 
-enum Status
-{
-	error_generic = -1,
-	ok,
-	error_arguments
-};
-
-
 enum Des_info
 {
 	block_size = 64,
-	input_size = block_size / (sizeof(char) * byte), // valido sia per input che per chiave
+	input_size = block_size / (ui8_size * byte), // valido sia per input che per chiave
 	rounds = 16,
 
 	key_size_PC1 = 56,

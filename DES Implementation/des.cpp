@@ -11,21 +11,28 @@ int main(int argc, char** argv)
 	}
 	catch (ArgumentsException e)
 	{
-		std::cerr << "Catturata ArgumentsException: " << e.getError() << '\n' << std::endl;
-		print_usageError(argv[0]);
-		return error_arguments;
+		std::cerr << "\nCatturata ArgumentsException: " << e.getError() << "\n\n";
+		printUsageError(argv[0]);
+		std::cerr << std::endl;
+
+		return -1;
 	}
 
 	_LOG("[main()] Input impostato correttamente.\n\n")
 
-	Status return_code = des_main(arguments);
+	_LOG(
+		"[main()] Input: \"" + arguments.input_string + "\"\n" +
+		"[main()] Chiave: \"" + arguments.key_string + "\"\n" +
+		"[main()] Tipo di input: " + std::to_string(arguments.input_type) + "\n" +
+		"[main()] Funzione: " + std::to_string(arguments.program_function) + "\n\n"
+	)
 
-	return return_code;
+	des_main(arguments);
 
 	return 0;
 }
 
-Status des_main(const Arguments& arguments)
+void des_main(const Arguments& arguments)
 {
 	/* Input parsing */
 	ProgramFunction		function		{ arguments.program_function };	// questo serve a capire se criptare o decriptare
@@ -39,20 +46,20 @@ Status des_main(const Arguments& arguments)
 	{
 	case hexadecimal:
 		_LOG("[des_main()] Conversione da stringa(esadecimale) a \'ui64\'.\n\n")
-		input	= stringToUi64(input_string, std::hex);
-		key		= stringToUi64(key_string, std::hex);
+		input	= stringBaseToUi64(input_string, std::hex);
+		key		= stringBaseToUi64(key_string, std::hex);
 		break;
 
 	case decimal:
 		_LOG("[des_main()] Conversione da stringa(decimale) a \'ui64\'.\n\n")
-		input	= stringToUi64(input_string, std::dec);
-		key		= stringToUi64(key_string, std::dec);
+		input	= stringBaseToUi64(input_string, std::dec);
+		key		= stringBaseToUi64(key_string, std::dec);
 		break;
 
 	case string:
 		_LOG("[des_main()] Conversione da stringa(ascii) a \'ui64\'.\n\n")
-		input	= asciiToUi64(input_string);
-		key		= asciiToUi64(key_string);
+		input	= stringASCIIToUi64(input_string);
+		key		= stringASCIIToUi64(key_string);
 	}
 	/* ------------- */
 
@@ -60,30 +67,30 @@ Status des_main(const Arguments& arguments)
 	std::cout << std::hex;
 
 	std::cout	<< "Input:\t\"" << input_string << "\" -> 0x" << input
-				<< "\nChiave:\t\"" << key_string << "\" -> 0x" << key
+				<< "\nChiave:\t\"" << key_string << "\" -> 0x" << key << ((isUi64Printable(key)) ? (" -> \"" + uiToASCIIString(key) + "\"") : "")
 				<< "\n\n";
 
 	std::cout << std::dec;
 
-	ui64 result{ des_operate(input, key, function) };
+	ui64 result{ operateOnBlock(input, key, function) };
 	/* ------ */
 	std::cout << std::hex;
 
-	std::cout << ((function) ? "Decrypt: 0x" : "Crypt: 0x") << result << ((isUi64Printable(result)) ? (" -> \"" + uiToASCIIString(result) + "\"\n") : "\n");
+	std::cout << ((function) ? "Testo in chiaro: 0x" : "Testo cifrato: 0x") << result << ((isUi64Printable(result)) ? (" -> \"" + uiToASCIIString(result) + "\"\n") : "\n");
 	std::cout << std::dec;
-
-	return ok;
 }
 
-ui64 des_operate(ui64 input, ui64 key, ProgramFunction function)
+ui64 operateOnBlock(ui64 input, ui64 key, ProgramFunction function)
 {
 	std::array<ui64, rounds> keyTable{};
 	key_schedule(key, keyTable);
-	_LOG("[des_operate()] Chiavi ottenute.\n\n")
+
+	_LOG("[operateOnBlock()] Chiavi ottenute.\n\n")
 
 	permute(input, des_data::initial_perm_matrix);
+
 	_LOG(
-		"[des_operate()] Permutazione iniziale: \n" +
+		"[operateOnBlock()] Permutazione iniziale: \n" +
 		uiBitsToString(input, 8) + " -> 0x" + ui64ToString(input, std::hex) + "\n\n"
 	)
 
@@ -93,18 +100,19 @@ ui64 des_operate(ui64 input, ui64 key, ProgramFunction function)
 	if (function == decrypt)
 	{
 		std::ranges::reverse(keyTable);
-		_LOG("[des_operate()] function == decrypt, inverto \'keyTable\'.\n\n")
+		_LOG("[operateOnBlock()] function == decrypt, inverto \'keyTable\'.\n\n")
 	}
 
 	ui32 oldLeftPart{};
 	for (int i = 0; i < rounds; ++i)
 	{
 		_LOG(
-			"[des_operate()] Round " + std::to_string(i + 1) + ": \n" +
+			"[operateOnBlock()] Round " + std::to_string(i + 1) + ": \n" +
 			"\tL" + std::to_string(i) + ": " + uiBitsToString(inputLeftPart, 8) + " -> 0x" + ui64ToString(inputLeftPart, std::hex) + "\n" +
 			"\tR" + std::to_string(i) + ": " + uiBitsToString(inputRightPart, 8) + " -> 0x" + ui64ToString(inputRightPart, std::hex) + "\n" +
 			"\tChiave " + std::to_string(i) + ": " + uiBitsToString(keyTable.at(i), 7, 15) + " -> 0x" + ui64ToString(keyTable.at(i), std::hex) + "\n"
 		)
+
 		oldLeftPart = inputLeftPart;
 		inputLeftPart = inputRightPart;
 
@@ -112,7 +120,7 @@ ui64 des_operate(ui64 input, ui64 key, ProgramFunction function)
 		
 		_LOG(
 			"\tR" + std::to_string(i + 1) + " = L" + std::to_string(i) +
-			" OR feistel(R" + std::to_string(i) + ", Chiave" + std::to_string(i) + "): " +
+			" XOR feistel(R" + std::to_string(i) + ", Chiave" + std::to_string(i) + "): " +
 			uiBitsToString(inputRightPart, 8) + " -> 0x" + ui64ToString(inputRightPart, std::hex) + "\n\n"
 		)
 	}
@@ -133,7 +141,7 @@ ui64 des_operate(ui64 input, ui64 key, ProgramFunction function)
  *	segue le posizioni date da 'permuteTable'
  *	{ 0 < permuteTable.size() <= (sizeof(_Ui) * byte) }
 \*/
-template <bit_manipulation::UnsignedInteger _Ui, std::size_t size>
+template <std::unsigned_integral _Ui, std::size_t size>
 void permute(_Ui& input, const std::array<int, size>& permuteTable, int inputSize)
 {
 	assert( // bounds checking
@@ -166,7 +174,8 @@ void key_schedule(ui64 key, std::array<ui64, rounds>& dst)
 	
 	_LOG(
 		"[key_schedule()] Chiave permutata(PC-1):\n" +
-		uiBitsToString(key, 8) + " -> 0x" + ui64ToString(key, std::hex) + "\n\n"
+		uiBitsToString(key, 8) + " -> 0x" + ui64ToString(key, std::hex) + "\n\n" +
+		"[key_schedule()] Chiavi:\n"
 	)
 
 	ui32 leftPart	{ static_cast<ui32>(key >> key_size_PC1 / 2) };	// 28-bit
@@ -238,7 +247,7 @@ ui32 feistel(ui32 block, ui64 key) // la chiave è a 48-bit, salvata come 64-bit
 }
 
 #ifdef _DEBUG
-template <bit_manipulation::UnsignedInteger _Ui>
+template <std::unsigned_integral _Ui>
 std::string uiBitsToString(_Ui x, int separatorMultiple, int startPos)
 {
 	std::string output{ std::bitset<sizeof(_Ui)* byte>(x).to_string() };

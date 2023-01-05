@@ -2,6 +2,7 @@
 #define _INPUT_HANDLING_
 
 #include <iostream>
+#include <array>
 #include <algorithm>
 #include <ranges>
 #include <string>
@@ -27,7 +28,7 @@ public:
 enum ProgramFunction
 {
 	program_function_undefined = -1,
-	crypt,
+	encrypt,
 	decrypt
 };
 
@@ -50,11 +51,22 @@ struct Arguments
 
 constexpr int EXPECTED_ARGUMENTS{ 5 };
 
+namespace accepted_input
+{
+	constexpr std::array<std::string_view, 3> HEX{ "h", "hex", "hexadecimal" };
+	constexpr std::array<std::string_view, 3> DEC{ "d", "dec", "decimal" };
+	constexpr std::array<std::string_view, 3> STR{ "s", "str", "string" };
+
+	constexpr std::array<std::string_view, 2> ENCRYPT{ "e", "encrypt" };
+	constexpr std::array<std::string_view, 2> DECRYPT{ "d", "decrypt" };
+}
+
 void				setInput				(int argc, char** argv, Arguments& dst);
-void				print_usageError		(const char* argv_zero);
+void				printUsageError			(const char* argv_zero);
 void				getInputManually		(Arguments& dst);
 InputType			checkInputType			(std::string_view str);
 ProgramFunction		checkProgramFunction	(std::string_view str);
 
+std::vector<ui64>	inputToBlocks			(std::string input, InputType type);
 
 #endif // _INPUT_HANDLING_

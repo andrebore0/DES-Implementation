@@ -3,14 +3,13 @@
 
 #include <iostream>
 #include <stdint.h>
+#include <concepts> // per ::std::unsigned_integral
 
 #if !defined (_DEBUG) && !defined (NDEBUG)
 #define NDEBUG
 #endif
 
-#include <cassert>
-
-#define DONOTHING ((void)0) // miglior lettura del codice;
+#include <cassert> // NDEBUG serve qui.
 
 typedef std::uint8_t	ui8;	// intero a 8-bit senza segno
 typedef std::uint16_t	ui16;	// intero a 16-bit senza segno
@@ -34,9 +33,6 @@ enum Sizes : ui64
 
 namespace bit_manipulation
 {
-	template <typename T>
-	concept UnsignedInteger = std::is_unsigned_v<T>; // definisce il concept per un numero intero senza segno
-
 	/*\
 	 *	ritorna il bit di 'src' nella posizione indicata da 'pos'
 	 *	{ 0 <= pos < ui64_size }
@@ -47,7 +43,7 @@ namespace bit_manipulation
 	 *	ritorna il byte di 'src' nella posizione indicata da 'pos'
 	 *	{ 0 <= pos <= sizeof(_Ui) }
 	\*/
-	template <UnsignedInteger _Ui>
+	template <std::unsigned_integral _Ui>
 	ui8 getByte(_Ui src, std::size_t pos)
 	{
 		assert(
@@ -63,7 +59,7 @@ namespace bit_manipulation
 	 *	imposta il bit alla posizione 'pos' di 'src' a 'bitState'
 	 *	{ 0 <= pos < sizeof(_Ui) * byte }
 	\*/
-	template <UnsignedInteger _Ui>
+	template <std::unsigned_integral _Ui>
 	void setBit(_Ui& dst, std::size_t pos, bool bitState) // qui serve usare un template per mantenere la lunghezza dell'argomento
 	{
 		assert(
@@ -86,7 +82,7 @@ namespace bit_manipulation
 	 *	la direzione dipende da 'shiftLeft', di default a 'true'.
 	 *	{ 0 <= pos < sizeof(_Ui) * byte }
 	\*/
-	template <UnsignedInteger _Ui>
+	template <std::unsigned_integral _Ui>
 	void rotateBits(_Ui& dst, std::size_t pos, std::size_t leftBound = (sizeof(_Ui) * byte) - 1, bool shiftLeft = true)
 	{
 		assert( // mi assicuro che leftBound non sia più grande di quanto possibile dal tipo
