@@ -71,7 +71,7 @@ Il DES è un'algoritmo di cifratura a blocchi a chiave simmetrica ampiamente uti
 **Il progetto non è una libreria e fornisce solo file binari quando viene compilato.**
 
 ## Compilazione
-Per compilare il progetto con [CMake](https://cmake.org, seguire questi passaggi:
+Per compilare il progetto con [CMake](https://cmake.org), seguire questi passaggi:
 
 ### Windows
 * Clona la repository:
