@@ -3,14 +3,11 @@
 This is a GitHub repository for an implementation of the Data Encryption Standard (DES) algorithm in C++20.\
 DES is a symmetric-key block cipher algorithm that was widely used for encryption of electronic data in the 1970s and 1980s.
 
-### Source
-The implementation in this project is based on the description of the algorithm found at https://page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm.
-
 **The project is not a library and only provides binaries when built.**
 
-## Generating the buildfiles
+## Building
 
-To generate the buildfiles with [CMake](https://cmake.org), follow these steps:
+To build with [CMake](https://cmake.org), follow these steps:
 
 ### Windows
 * Clone the repository:
@@ -73,10 +70,8 @@ Il DES è un'algoritmo di cifratura a blocchi a chiave simmetrica ampiamente uti
 
 **Il progetto non è una libreria e fornisce solo file binari quando viene compilato.**
 
-Compilazione
-Per compilare il progetto, seguire questi passaggi:
-
-To generate the buildfiles with [CMake](https://cmake.org), follow these steps:
+## Compilazione
+Per compilare il progetto con [CMake](https://cmake.org, seguire questi passaggi:
 
 ### Windows
 * Clona la repository:
