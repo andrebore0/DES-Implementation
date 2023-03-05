@@ -64,7 +64,9 @@ The binaries can be executed with or without parameters, and you can pass parame
 ## Acknowledgments
 The DES algorithm was originally designed by *IBM* and was adopted by the *National Institute of Standards and Technology* (NIST) in 1977 as a federal standard for encryption.\
 The implementation in this project is based on the description of the algorithm found at https://page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm.
+
 ---
+
 # (It) Implementazione DES
 Questo è un repository GitHub per un'implementazione dell'algoritmo Data Encryption Standard (DES) in C++20.\
 Il DES è una cifratura a blocchi a chiave simmetrica ampiamente utilizzata per la crittografia di dati elettronici negli anni '70 e '80.
