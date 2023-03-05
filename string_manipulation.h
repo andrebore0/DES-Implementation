@@ -9,7 +9,7 @@
 #include <cstring>
 #include "bit_manipulation.h"
 
-std::string	hexUi64ToString		(ui64 input, std::ios_base& (*ui64_format)(std::ios_base&) = std::dec);
+std::string	hexUi64ToString		(ui64 input);
 ui64		stringBaseToUi64Hex		(const std::string& str);
 std::string	toLowerCase			(std::string_view str);
 bool		compareString		(std::string_view str, std::string_view possibleValue, bool checkCase = true);

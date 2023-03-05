@@ -5,10 +5,6 @@
 #include <stdint.h>
 #include <concepts> // per ::std::unsigned_integral
 
-#if !defined (_DEBUG) && !defined (NDEBUG)
-#define NDEBUG
-#endif
-
 #include <cassert> // NDEBUG serve qui.
 
 typedef std::uint8_t	ui8;	// intero a 8-bit senza segno
@@ -37,7 +33,7 @@ namespace bit_manipulation
 	 *	ritorna il bit di 'src' nella posizione indicata da 'pos'
 	 *	{ 0 <= pos < ui64_size }
 	\*/
-	bool getBit(ui64 src, std::size_t pos); // non c'è necessità di usare template qui, ritorna sempre 0 o 1.
+	bool getBit(ui64 src, std::size_t pos); // non c'ï¿½ necessitï¿½ di usare template qui, ritorna sempre 0 o 1.
 
 	/*\
 	 *	ritorna il byte di 'src' nella posizione indicata da 'pos'
@@ -85,7 +81,7 @@ namespace bit_manipulation
 	template <std::unsigned_integral _Ui>
 	void rotateBits(_Ui& dst, std::size_t pos, std::size_t leftBound = (sizeof(_Ui) * byte) - 1, bool shiftLeft = true)
 	{
-		assert( // mi assicuro che leftBound non sia più grande di quanto possibile dal tipo
+		assert( // mi assicuro che leftBound non sia piï¿½ grande di quanto possibile dal tipo
 			(leftBound < (sizeof(_Ui) * byte))
 			&&
 			"\'leftBound\' greater than (\'sizeof(_Ui)\' * \'byte\') in \'rotateBits(_Ui&, std::size_t, std::size_t, bool)\'"

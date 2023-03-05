@@ -7,7 +7,7 @@
 #include "string_manipulation.h"
 #include "input_handling.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 #include <bitset>
 
@@ -17,7 +17,7 @@
 
 #define _LOG(x) ;
 
-#endif
+#endif // NDEBUG
 
 /* Forward Declarations / Firme */
 void		des_main			(const Arguments& arguments);

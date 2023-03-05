@@ -11,7 +11,9 @@ int main(int argc, char** argv)
 	}
 	catch (ArgumentsException e)
 	{
-		std::cerr << "\nCatturata ArgumentsException: " << e.getError() << "\n\n";
+#ifndef NDEBUG
+		std::cout << "Catturata Eccezione ArgumentException: " << e.getError() << "\n\n";
+#endif
 		printUsageError(argv[0]);
 		std::cerr << std::endl;
 
@@ -85,7 +87,7 @@ ui64 operateOnBlock(ui64 input, ui64 key, ProgramFunction function)
 
 	_LOG(
 		"[operateOnBlock()] Permutazione iniziale: \n" +
-		uiBitsToString(input, 8) + " -> 0x" + ui64ToString(input, std::hex) + "\n\n"
+		uiBitsToString(input, 8) + " -> 0x" + hexUi64ToString(input) + "\n\n"
 	)
 
 	ui32 inputLeftPart	{ static_cast<ui32>(input >> ui64_size / 2) };	// L0
@@ -102,9 +104,9 @@ ui64 operateOnBlock(ui64 input, ui64 key, ProgramFunction function)
 	{
 		_LOG(
 			"[operateOnBlock()] Round " + std::to_string(i + 1) + ": \n" +
-			"\tL" + std::to_string(i) + ": " + uiBitsToString(inputLeftPart, 8) + " -> 0x" + ui64ToString(inputLeftPart, std::hex) + "\n" +
-			"\tR" + std::to_string(i) + ": " + uiBitsToString(inputRightPart, 8) + " -> 0x" + ui64ToString(inputRightPart, std::hex) + "\n" +
-			"\tChiave " + std::to_string(i) + ": " + uiBitsToString(keyTable.at(i), 7, 15) + " -> 0x" + ui64ToString(keyTable.at(i), std::hex) + "\n"
+			"\tL" + std::to_string(i) + ": " + uiBitsToString(inputLeftPart, 8) + " -> 0x" + hexUi64ToString(inputLeftPart) + "\n" +
+			"\tR" + std::to_string(i) + ": " + uiBitsToString(inputRightPart, 8) + " -> 0x" + hexUi64ToString(inputRightPart) + "\n" +
+			"\tChiave " + std::to_string(i) + ": " + uiBitsToString(keyTable.at(i), 7, 15) + " -> 0x" + hexUi64ToString(keyTable.at(i)) + "\n"
 		)
 
 		oldLeftPart = inputLeftPart;
@@ -115,14 +117,14 @@ ui64 operateOnBlock(ui64 input, ui64 key, ProgramFunction function)
 		_LOG(
 			"\tR" + std::to_string(i + 1) + " = L" + std::to_string(i) +
 			" XOR feistel(R" + std::to_string(i) + ", Chiave" + std::to_string(i) + "): " +
-			uiBitsToString(inputRightPart, 8) + " -> 0x" + ui64ToString(inputRightPart, std::hex) + "\n\n"
+			uiBitsToString(inputRightPart, 8) + " -> 0x" + hexUi64ToString(inputRightPart) + "\n\n"
 		)
 	}
 
 	ui64 output{ (static_cast<ui64>(inputRightPart) << (block_size / 2)) | inputLeftPart }; // R16 concat L16
 
 	_LOG(
-		"Output pre-permutazione: " + uiBitsToString(output, 8) + " -> 0x" + ui64ToString(output, std::hex) + "\n\n"
+		"Output pre-permutazione: " + uiBitsToString(output, 8) + " -> 0x" + hexUi64ToString(output) + "\n\n"
 	)
 
 	permute(output, des_data::final_perm_matrix);
@@ -168,7 +170,7 @@ void key_schedule(ui64 key, std::array<ui64, rounds>& dst)
 	
 	_LOG(
 		"[key_schedule()] Chiave permutata(PC-1):\n" +
-		uiBitsToString(key, 8) + " -> 0x" + ui64ToString(key, std::hex) + "\n\n" +
+		uiBitsToString(key, 8) + " -> 0x" + hexUi64ToString(key) + "\n\n" +
 		"[key_schedule()] Chiavi:\n"
 	)
 
@@ -197,7 +199,7 @@ void key_schedule(ui64 key, std::array<ui64, rounds>& dst)
 
 		_LOG(
 			"Chiave " + std::to_string(i + 1) + ": " +
-			uiBitsToString(temp, 8) + " -> 0x" + ui64ToString(temp, std::hex) +
+			uiBitsToString(temp, 8) + " -> 0x" + hexUi64ToString(temp) +
 			"\n"
 		)
 
@@ -207,7 +209,7 @@ void key_schedule(ui64 key, std::array<ui64, rounds>& dst)
 	_LOG("\n")
 }
 
-ui32 feistel(ui32 block, ui64 key) // la chiave è a 48-bit, salvata come 64-bit
+ui32 feistel(ui32 block, ui64 key) // la chiave ï¿½ a 48-bit, salvata come 64-bit
 {
 	ui64 blockCopy	{ block };
 	ui32 output		{};
@@ -240,7 +242,7 @@ ui32 feistel(ui32 block, ui64 key) // la chiave è a 48-bit, salvata come 64-bit
 	return output;
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 template <std::unsigned_integral _Ui>
 std::string uiBitsToString(_Ui x, int separatorMultiple, int startPos)
 {
@@ -260,4 +262,4 @@ std::string uiBitsToString(_Ui x, int separatorMultiple, int startPos)
 
 	return output.substr(startPos);
 }
-#endif // _DEBUG
+#endif // NDEBUG

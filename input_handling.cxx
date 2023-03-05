@@ -117,11 +117,11 @@ void printUsageError(const char* argv_zero) // stampa il messaggio di errore
 
 		std::ranges::reverse(arg0); // 'exe.cba' -> 'abc.exe'
 
-		std::cout << "Utilizzo: " << arg0 << " (-encrypt|-decrypt) (-hex|-dec|-str) <input> <chiave>";
+		std::cout << "Utilizzo: " << arg0 << " (-encrypt|-decrypt) (-hex|-str) <input> <chiave>";
 	}
 	else
 	{
-		std::cout << "Utilizzo: <nome_programma> (-encrypt|-decrypt) (-hex|-dec|-str) <input> <chiave>";
+		std::cout << "Utilizzo: <nome_programma> (-encrypt|-decrypt) (-hex|-str) <input> <chiave>";
 	}
 }
 
