@@ -1,14 +1,14 @@
 #include "string_manipulation.h"
 
-std::string ui64ToString(ui64 input, std::ios_base& (*ui64_format)(std::ios_base&))
+std::string hexUi64ToString(ui64 input)
 {
-	return (std::ostringstream{} << ui64_format << input).str();
+	return (std::ostringstream{} << std::hex << input).str();
 }
 
-ui64 stringBaseToUi64(const std::string& str, std::ios_base& (*string_format)(std::ios_base&))
+ui64 stringBaseToUi64Hex(const std::string& str)
 {
 	ui64 output{};
-	static_cast<std::istringstream>(str) >> string_format >> output;
+	static_cast<std::istringstream>(str) >> std::hex >> output;
 
 	return output;
 }

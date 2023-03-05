@@ -46,14 +46,8 @@ void des_main(const Arguments& arguments)
 	{
 	case hexadecimal:
 		_LOG("[des_main()] Conversione da stringa(esadecimale) a \'ui64\'.\n\n")
-		input	= stringBaseToUi64(input_string, std::hex);
-		key		= stringBaseToUi64(key_string, std::hex);
-		break;
-
-	case decimal:
-		_LOG("[des_main()] Conversione da stringa(decimale) a \'ui64\'.\n\n")
-		input	= stringBaseToUi64(input_string, std::dec);
-		key		= stringBaseToUi64(key_string, std::dec);
+		input	= stringBaseToUi64Hex(input_string);
+		key		= stringBaseToUi64Hex(key_string);
 		break;
 
 	case string:

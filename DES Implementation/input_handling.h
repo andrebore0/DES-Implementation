@@ -36,7 +36,6 @@ enum InputType
 {
 	input_type_undefined = -1,
 	hexadecimal,
-	decimal,
 	string
 };
 
@@ -54,7 +53,6 @@ constexpr int EXPECTED_ARGUMENTS{ 5 };
 namespace accepted_input
 {
 	constexpr std::array<std::string_view, 3> HEX{ "h", "hex", "hexadecimal" };
-	constexpr std::array<std::string_view, 3> DEC{ "d", "dec", "decimal" };
 	constexpr std::array<std::string_view, 3> STR{ "s", "str", "string" };
 
 	constexpr std::array<std::string_view, 2> ENCRYPT{ "e", "encrypt" };

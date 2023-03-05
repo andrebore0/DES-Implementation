@@ -30,16 +30,15 @@ void setInput(int argc, char** argv, Arguments& dst) // imposto gli argomenti da
 void getInputManually(Arguments& dst)
 {
 	/* Tipo di input */
-	std::cout << "Tipi di input accettati: (hex|hexadecimal|h) | (dec|decimal|d) | (str|string|s)\n\n";
+	std::cout << "Tipi di input accettati: (hex|hexadecimal|h) | (str|string|s)\n\n";
 	std::cout << "Inserire tipo di input: ";
 	std::string input_type_str;
 	std::getline(std::cin >> std::ws, input_type_str);
 
 	while (!compareString(input_type_str, accepted_input::HEX, false) &&
-		!compareString(input_type_str, accepted_input::DEC, false) &&
 		!compareString(input_type_str, accepted_input::STR, false))
 	{
-		std::cout << "Errore:\nTipi di input accettati: (hex|hexadecimal|h) | (dec|decimal|d) | (str|string|s)\n\n";
+		std::cout << "Errore:\nTipi di input accettati: (hex|hexadecimal|h) | (str|string|s)\n\n";
 
 		std::cout << "Inserire tipo di input: ";
 		std::getline(std::cin >> std::ws, input_type_str);
@@ -81,10 +80,6 @@ InputType checkInputType(std::string_view str)
 	if (compareString(str, accepted_input::HEX, false))
 	{
 		return hexadecimal;
-	}
-	if (compareString(str, accepted_input::DEC, false))
-	{
-		return decimal;
 	}
 	if (compareString(str, accepted_input::STR, false))
 	{
