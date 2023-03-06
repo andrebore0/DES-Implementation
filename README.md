@@ -12,7 +12,7 @@ To build with [CMake](https://cmake.org), follow these steps:
 ### Windows
 * Clone the repository:
 ```
-git clone https://github.com/andrebore0/DES-Implementation.git
+git clone https://github.com/andrebore04/DES-Implementation.git
 ```
 * Create a folder inside the repository and cd into it:
 ```
@@ -76,7 +76,7 @@ Per compilare il progetto con [CMake](https://cmake.org), seguire questi passagg
 ### Windows
 * Clona la repository:
 ```
-git clone https://github.com/andrebore0/DES-Implementation.git
+git clone https://github.com/andrebore04/DES-Implementation.git
 ```
 * Crea una cartella ed entraci:
 ```
