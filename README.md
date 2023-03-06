@@ -36,7 +36,7 @@ mingw32-make
 ### Linux
 * Clone the repository:
 ```
-git clone https://github.com/andrebore0/DES-Implementation.git
+git clone https://github.com/andrebore04/DES-Implementation.git
 ```
 * Create a folder inside the repository and cd into it:
 ```
@@ -100,7 +100,7 @@ mingw32-make
 ### Linux
 * Clona la repository:
 ```
-git clone https://github.com/andrebore0/DES-Implementation.git
+git clone https://github.com/andrebore04/DES-Implementation.git
 ```
 * Crea una cartella ed entraci:
 ```
