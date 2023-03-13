@@ -43,11 +43,11 @@ git clone https://github.com/andrebore04/DES-Implementation.git
 mkdir build
 cd build
 ```
-* Configure and generate the buildfiles with CMake-gui or from the terminal:
+* Configure and generate the buildfiles:
 ```
 cmake ../
 ```
-* From the terminal, build the project with make:
+* Build the project with make:
 ```
 make
 ```
@@ -107,11 +107,11 @@ git clone https://github.com/andrebore04/DES-Implementation.git
 mkdir build
 cd build
 ```
-* Configura e genera i buildfiles con CMake-gui o dal terminale esegui:
+* Configura e genera i buildfiles:
 ```
 cmake ../
 ```
-* Dal terminale, compila il progetto con make:
+* Compila il progetto con make:
 ```
 make
 ```
