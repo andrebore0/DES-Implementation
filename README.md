@@ -120,7 +120,7 @@ cmake ../
 make
 ```
 
-## Usage
+## Utilizzo
 Il file eseguibile può essere utilizzato con o senza parametri, l'ordine dei parametri è il seguente:
 ```
 .\DES-Implementation (-encrypt|-decrypt) (-hex|-str) <input> <chiave>
