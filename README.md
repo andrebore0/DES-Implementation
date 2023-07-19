@@ -13,6 +13,7 @@ To build with [CMake](https://cmake.org), follow these steps:
 * Clone the repository:
 ```
 git clone https://github.com/andrebore04/DES-Implementation.git
+cd DES-Implementation
 ```
 * Create a folder inside the repository and cd into it:
 ```
@@ -37,6 +38,7 @@ mingw32-make
 * Clone the repository:
 ```
 git clone https://github.com/andrebore04/DES-Implementation.git
+cd DES-Implementation
 ```
 * Create a folder inside the repository and cd into it:
 ```
@@ -77,6 +79,7 @@ Per compilare il progetto con [CMake](https://cmake.org), seguire questi passagg
 * Clona la repository:
 ```
 git clone https://github.com/andrebore04/DES-Implementation.git
+cd DES-Implementation
 ```
 * Crea una cartella ed entraci:
 ```
@@ -101,6 +104,7 @@ mingw32-make
 * Clona la repository:
 ```
 git clone https://github.com/andrebore04/DES-Implementation.git
+cd DES-Implementation
 ```
 * Crea una cartella ed entraci:
 ```
